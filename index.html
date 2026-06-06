@@ -1,44 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My First Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: auto;
-            text-align: center;
-            padding: 50px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find The Black Orb</title>
 
-        h1 {
-            color: #0077cc;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-    </style>
+    body {
+        overflow: hidden;
+        background: #111;
+        font-family: Arial, sans-serif;
+        cursor: crosshair;
+    }
+
+    #game {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+    }
+
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        transition: transform 0.1s;
+    }
+
+    .orb:hover {
+        transform: scale(1.1);
+    }
+
+    .white {
+        background: white;
+        box-shadow: 0 0 10px white;
+    }
+
+    .black {
+        background: black;
+        border: 2px solid #444;
+        box-shadow: 0 0 10px #666;
+    }
+
+    #hud {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        color: white;
+        font-size: 24px;
+        z-index: 999;
+        user-select: none;
+    }
+
+    #message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: red;
+        font-size: 40px;
+        font-weight: bold;
+        display: none;
+        pointer-events: none;
+    }
+</style>
 </head>
 <body>
 
-    <h1>larp larp larp sahuur</h1>
+<div id="hud">
+    Score: <span id="score">0</span>
+</div>
 
-    <p>im skidding so hard rn</p>
+<div id="message">MISS!</div>
 
-    <button onclick="showMessage()">
-        tung
-    </button>
+<div id="game"></div>
 
-    <p id="message"></p>
+<script>
+const game = document.getElementById("game");
+const scoreDisplay = document.getElementById("score");
+const message = document.getElementById("message");
 
-    <script>
-        function showMessage() {
-            document.getElementById("message").innerText =
-                "sahur!";
-        }
-    </script>
+let score = 0;
+let blackOrb = null;
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function createRound() {
+    game.innerHTML = "";
+
+    const orbCount = 250;
+
+    for (let i = 0; i < orbCount; i++) {
+        const orb = document.createElement("div");
+
+        const size = random(15, 50);
+
+        orb.classList.add("orb", "white");
+        orb.style.width = size + "px";
+        orb.style.height = size + "px";
+        orb.style.left = random(0, window.innerWidth - size) + "px";
+        orb.style.top = random(0, window.innerHeight - size) + "px";
+
+        orb.addEventListener("click", missShot);
+
+        game.appendChild(orb);
+    }
+
+    blackOrb = document.createElement("div");
+
+    const blackSize = random(15, 50);
+
+    blackOrb.classList.add("orb", "black");
+    blackOrb.style.width = blackSize + "px";
+    blackOrb.style.height = blackSize + "px";
+    blackOrb.style.left =
+        random(0, window.innerWidth - blackSize) + "px";
+    blackOrb.style.top =
+        random(0, window.innerHeight - blackSize) + "px";
+
+    blackOrb.addEventListener("click", hitBlackOrb);
+
+    game.appendChild(blackOrb);
+}
+
+function hitBlackOrb(event) {
+    event.stopPropagation();
+
+    score++;
+    scoreDisplay.textContent = score;
+
+    createRound();
+}
+
+function missShot() {
+    showMiss();
+}
+
+function showMiss() {
+    message.style.display = "block";
+
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 400);
+}
+
+game.addEventListener("click", () => {
+    showMiss();
+});
+
+window.addEventListener("resize", createRound);
+
+createRound();
+</script>
 
 </body>
 </html>
